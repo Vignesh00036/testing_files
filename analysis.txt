@@ -1,11 +1,15 @@
-i-0dcb2724fe4b67f6e - 20'o clock cron
-i-0d9dc5b3802ed313d - We can resize this
-i-01dc6ea60b6b43c6d - no need for resize
-i-03888794eb317bc2f - We can resize this
-i-061e6bbc492f40436 - 5 and 2 'o clock cron
-i-06e2482f11392d334 - We can resize this
-i-07c7469edde2015cb - We can resize this
-i-08417f894e1079a40 - We can resize this
-i-0910df3629f051e85 - We can resize this
-i-0a19fa2da014d4b52 - We can resize this
-i-0fcd9c884521df133 - 20.30'o clock cron
+1, i-01dc6ea60b6b43c6d - no need for resize, (76%)
+2, i-03888794eb317bc2f - We can resize this, (12.3%), 
+3, i-061e6bbc492f40436 - 5 and 2 'o clock cron, deleting files (36.8%), 
+4, i-06e2482f11392d334 - We can resize this, (32.5%), 
+5, i-07c7469edde2015cb - We can resize this, (10%), 
+6, i-08417f894e1079a40 - We can resize this, (3%), 
+7, i-0910df3629f051e85 - We can resize this, (37.1%), 
+8, i-0a19fa2da014d4b52 - We can resize this, (13%), 
+9, i-0b1a4935e03d187ee - We can resize this, (61.8%), 
+10, i-0c6c99c1bd0c85cec - 00.00 cron, (55.7%), 
+11, i-0d9dc5b3802ed313d - We can resize this, (31.9% only once), 
+12, i-0dcb2724fe4b67f6e - 20.00 cron, (62.5%), 
+
+
+13, i-0a2a5a0cb789bdc77 - We can resize this, (7.06%), ---doubt
