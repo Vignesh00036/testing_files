@@ -1,5 +1,7 @@
 import os
 import pandas as pd
+import smtplib
+from email.message import EmailMessage
 
 #----------------- CPU status -----------------------#
 with open('/home/sba/Desktop/Vignesh/confidential/nhm_automation/cpu_file.txt') as file:
