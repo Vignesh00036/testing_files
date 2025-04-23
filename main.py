@@ -127,3 +127,7 @@ try:
 
 except Exception as e:
     print(f'Failed to send email: {e}')
+
+## Cron job
+
+30 10 * * * /media/beast/Beast/DE/Python_programms/Email/summa.sh
