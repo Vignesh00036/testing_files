@@ -80,9 +80,48 @@ print(mem_op)
 #     splitted_disk_data=disk_data.splitlines()
 #     splitted_disk_data=splitted_disk_data[1:]
 #     print(*splitted_disk_data, sep="\n")
-
 #     break
 
 # disk_op=pd.DataFrame({'Server names': server_names, 'Disk Usage': used_space, 'Mounted On': mounted_on})
 
 # print(disk_op)
+
+##----------------- Email Configuration -----------------------#
+
+# Configuration
+smtp_server = 'smtp.gmail.com'  # Replace with your Zimbra SMTP server
+smtp_port = 587  # Usually 587 for TLS
+sender_email = 'beastvignesh36@gmail.com'
+sender_password = 'tlzp ifle bokg zkoi'
+receiver_email = 'vigneshoffl36@gmail.com'
+cc_email = 'vigneshelumalai036@gmail.com'
+
+# Create the email
+msg = EmailMessage()
+msg['Subject'] = 'Test mail using python script'
+msg['From'] = sender_email
+msg['To'] = receiver_email
+msg['Cc'] = cc_email
+msg.set_content('Hello,\n\nPlease find the attached document.\n\nRegards,\nVignesh')
+
+# File attachment
+file_path = '/media/beast/Beast/DE/Python_programms/Email/email_sender.py'  # Change to your file path
+with open(file_path, 'rb') as file:
+    file_data = file.read()
+    file_name = file.name.split('/')[-1]
+
+msg.add_attachment(file_data, maintype='application', subtype='octet-stream', filename=file_name)
+
+# Combine all recipients (To + CC)
+all_recipients = [receiver_email] + [cc_email]
+
+# Send the email
+try:
+    with smtplib.SMTP(smtp_server, smtp_port) as server:
+        server.starttls()
+        server.login(sender_email, sender_password)
+        server.send_message(msg, from_addr=sender_email, to_addrs=all_recipients)
+    print("Email sent successfully!")
+
+except Exception as e:
+    print(f'Failed to send email: {e}')
