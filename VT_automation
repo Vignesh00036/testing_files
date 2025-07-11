@@ -1,0 +1,59 @@
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
+import time
+
+headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+chrome_options = Options()
+# chrome_options.add_argument("--headless")
+service = Service(r'/home/sba/Desktop/Vignesh/confidential/N-trust/python/chromedriver')
+driver = webdriver.Chrome(service=service, options=chrome_options)
+driver.get('https://www.virustotal.com/gui/home')
+driver.maximize_window()
+
+def find_search_button(driver):
+    vt_ui_shell = driver.find_element(By.TAG_NAME, 'vt-ui-shell')
+    view_container = vt_ui_shell.find_element(By.ID, 'view-container')
+    home_view = view_container.find_element(By.TAG_NAME, 'home-view')
+    shadow_host = driver.execute_script('return arguments[0].shadowRoot', home_view)
+    container_element=shadow_host.find_element(By.CLASS_NAME, 'container')
+    wrapper_element=container_element.find_element(By.CLASS_NAME, 'wrapper')
+    div_element=wrapper_element.find_element(By.TAG_NAME, 'div')
+    last_element=div_element.find_element(By.CLASS_NAME, 'omnibar')
+    final_element=last_element.find_element(By.CLASS_NAME, 'tabs-wrapper').find_element(By.CLASS_NAME, 'nav').find_elements(By.CLASS_NAME, 'nav-item')
+    target_element=final_element[2].find_element(By.ID, 'Search-tab')
+    target_element.click()
+    time.sleep(3)
+    putting_text_on_search_button()
+
+def putting_text_on_search_button():
+    vt_ui_shell = driver.find_element(By.TAG_NAME, 'vt-ui-shell')
+    view_container = vt_ui_shell.find_element(By.ID, 'view-container')
+    home_view = view_container.find_element(By.TAG_NAME, 'home-view')
+    shadow_host = driver.execute_script('return arguments[0].shadowRoot', home_view)
+    container_element=shadow_host.find_element(By.CLASS_NAME, 'container')
+    wrapper_element=container_element.find_element(By.CLASS_NAME, 'wrapper')
+    div_element=wrapper_element.find_element(By.TAG_NAME, 'div')
+    last_element=div_element.find_element(By.CLASS_NAME, 'omnibar')
+    final_element=last_element.find_element(By.CLASS_NAME, 'section-wrapper').find_element(By.CLASS_NAME, 'search').find_element(By.ID, 'searchbar')
+    shadow_host2 = driver.execute_script('return arguments[0].shadowRoot', final_element)
+    input_box=shadow_host2.find_element(By.CLASS_NAME, 'input-placeholder-wrapper').find_element(By.ID, 'searchInput')
+    input_box.send_keys('192.168.1.65')
+    time.sleep(3)
+    clicking_search()
+
+def clicking_search():
+    vt_ui_shell = driver.find_element(By.TAG_NAME, 'vt-ui-shell')
+    view_container = vt_ui_shell.find_element(By.ID, 'view-container')
+    home_view = view_container.find_element(By.TAG_NAME, 'home-view')
+    shadow_host = driver.execute_script('return arguments[0].shadowRoot', home_view)
+    container_element=shadow_host.find_element(By.CLASS_NAME, 'container')
+    wrapper_element=container_element.find_element(By.CLASS_NAME, 'wrapper')
+    div_element=wrapper_element.find_element(By.TAG_NAME, 'div')
+    last_element=div_element.find_element(By.CLASS_NAME, 'omnibar')
+    button=last_element.find_element(By.CLASS_NAME, 'section-wrapper').find_element(By.CLASS_NAME, 'search').find_element(By.CLASS_NAME, 'btn')
+    button.click()
+    time.sleep(30)
+
+find_search_button(driver)
