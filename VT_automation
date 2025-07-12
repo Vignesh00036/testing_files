@@ -2,58 +2,93 @@ from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 import time
+import re
+import os
 
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
 chrome_options = Options()
 # chrome_options.add_argument("--headless")
-service = Service(r'/home/sba/Desktop/Vignesh/confidential/N-trust/python/chromedriver')
+service = Service(r'/home/beast/Desktop/automation/vt/chromedriver')
 driver = webdriver.Chrome(service=service, options=chrome_options)
 driver.get('https://www.virustotal.com/gui/home')
 driver.maximize_window()
 
-def find_search_button(driver):
-    vt_ui_shell = driver.find_element(By.TAG_NAME, 'vt-ui-shell')
-    view_container = vt_ui_shell.find_element(By.ID, 'view-container')
-    home_view = view_container.find_element(By.TAG_NAME, 'home-view')
-    shadow_host = driver.execute_script('return arguments[0].shadowRoot', home_view)
-    container_element=shadow_host.find_element(By.CLASS_NAME, 'container')
-    wrapper_element=container_element.find_element(By.CLASS_NAME, 'wrapper')
-    div_element=wrapper_element.find_element(By.TAG_NAME, 'div')
-    last_element=div_element.find_element(By.CLASS_NAME, 'omnibar')
-    final_element=last_element.find_element(By.CLASS_NAME, 'tabs-wrapper').find_element(By.CLASS_NAME, 'nav').find_elements(By.CLASS_NAME, 'nav-item')
-    target_element=final_element[2].find_element(By.ID, 'Search-tab')
-    target_element.click()
-    time.sleep(3)
-    putting_text_on_search_button()
+tlds = [
+    'com', 'org', 'net', 'int', 'edu', 'gov', 'mil', 'co', 'io', 'ai', 'app', 'dev', 'tech', 'info', 'biz', 'xyz', 'me', 'online', 'site', 'store',
+    'in', 'us', 'uk', 'ca', 'au', 'de', 'fr', 'ru', 'cn', 'jp', 'kr', 'br', 'za', 'es', 'it', 'nl', 'se',
+    'tv', 'cc', 'name', 'pro', 'jobs', 'mobi', 'asia', 'tel', 'coop', 'museum', 'travel', 'cat',
+    'club', 'shop', 'blog', 'news', 'guru', 'today', 'life', 'solutions', 'world', 'agency'
+]
+ipv4_regex = r'\b(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\b'
 
-def putting_text_on_search_button():
+def gathering_details_ip(ip):
     vt_ui_shell = driver.find_element(By.TAG_NAME, 'vt-ui-shell')
-    view_container = vt_ui_shell.find_element(By.ID, 'view-container')
-    home_view = view_container.find_element(By.TAG_NAME, 'home-view')
-    shadow_host = driver.execute_script('return arguments[0].shadowRoot', home_view)
-    container_element=shadow_host.find_element(By.CLASS_NAME, 'container')
-    wrapper_element=container_element.find_element(By.CLASS_NAME, 'wrapper')
-    div_element=wrapper_element.find_element(By.TAG_NAME, 'div')
-    last_element=div_element.find_element(By.CLASS_NAME, 'omnibar')
-    final_element=last_element.find_element(By.CLASS_NAME, 'section-wrapper').find_element(By.CLASS_NAME, 'search').find_element(By.ID, 'searchbar')
-    shadow_host2 = driver.execute_script('return arguments[0].shadowRoot', final_element)
-    input_box=shadow_host2.find_element(By.CLASS_NAME, 'input-placeholder-wrapper').find_element(By.ID, 'searchInput')
-    input_box.send_keys('192.168.1.65')
-    time.sleep(3)
-    clicking_search()
+    shadow_host = driver.execute_script('return arguments[0].shadowRoot', vt_ui_shell)
+    uno_navbar=shadow_host.find_element(By.CSS_SELECTOR, 'uno-navbar')
+    shadow_host1 = driver.execute_script('return arguments[0].shadowRoot', uno_navbar).find_element(By.CLASS_NAME, 'hstack').find_element(By.CLASS_NAME, 'hstack').find_element(By.CLASS_NAME, 'hstack').find_element(By.CLASS_NAME, 'w-100')
+    shadow_host2 = driver.execute_script('return arguments[0].shadowRoot', shadow_host1).find_element(By.CLASS_NAME, 'hstack').find_element(By.CLASS_NAME, 'input-placeholder-wrapper').find_elements(By.CLASS_NAME, 'w-100')
+    input_box=shadow_host2[1].find_element(By.ID, 'searchInput')
+    input_box.clear()
+    input_box.send_keys(f'{ip}' + Keys.ENTER)
+    time.sleep(4)
+    ip_view = vt_ui_shell.find_element(By.ID, 'view-container').find_element(By.TAG_NAME, 'ip-address-view')
+    time.sleep(2)
+    shadow_host3 =driver.execute_script('return arguments[0].shadowRoot', ip_view).find_element(By.CLASS_NAME, 'container').find_element(By.CLASS_NAME, 'row').find_element(By.CLASS_NAME, 'col-12').find_element(By.TAG_NAME, 'vt-ioc-score-widget')
+    shadow_host4=driver.execute_script('return arguments[0].shadowRoot', shadow_host3).find_element(By.CLASS_NAME, 'rounded').find_element(By.TAG_NAME, 'vt-ioc-score-widget-detections-chart')
+    target_element=driver.execute_script('return arguments[0].shadowRoot', shadow_host4).find_element(By.CLASS_NAME, 'rounded-circle').find_element(By.CLASS_NAME, 'w-100').find_element(By.ID, 'positives')
+    return target_element.text
 
-def clicking_search():
+def gathering_details_domain(domain):
     vt_ui_shell = driver.find_element(By.TAG_NAME, 'vt-ui-shell')
-    view_container = vt_ui_shell.find_element(By.ID, 'view-container')
-    home_view = view_container.find_element(By.TAG_NAME, 'home-view')
-    shadow_host = driver.execute_script('return arguments[0].shadowRoot', home_view)
-    container_element=shadow_host.find_element(By.CLASS_NAME, 'container')
-    wrapper_element=container_element.find_element(By.CLASS_NAME, 'wrapper')
-    div_element=wrapper_element.find_element(By.TAG_NAME, 'div')
-    last_element=div_element.find_element(By.CLASS_NAME, 'omnibar')
-    button=last_element.find_element(By.CLASS_NAME, 'section-wrapper').find_element(By.CLASS_NAME, 'search').find_element(By.CLASS_NAME, 'btn')
-    button.click()
-    time.sleep(30)
+    shadow_host = driver.execute_script('return arguments[0].shadowRoot', vt_ui_shell)
+    uno_navbar=shadow_host.find_element(By.CSS_SELECTOR, 'uno-navbar')
+    shadow_host1 = driver.execute_script('return arguments[0].shadowRoot', uno_navbar).find_element(By.CLASS_NAME, 'hstack').find_element(By.CLASS_NAME, 'hstack').find_element(By.CLASS_NAME, 'hstack').find_element(By.CLASS_NAME, 'w-100')
+    shadow_host2 = driver.execute_script('return arguments[0].shadowRoot', shadow_host1).find_element(By.CLASS_NAME, 'hstack').find_element(By.CLASS_NAME, 'input-placeholder-wrapper').find_elements(By.CLASS_NAME, 'w-100')
+    input_box=shadow_host2[1].find_element(By.ID, 'searchInput')
+    input_box.clear()
+    input_box.send_keys(f'{domain}' + Keys.ENTER)
+    time.sleep(4)
+    domain_view = vt_ui_shell.find_element(By.ID, 'view-container').find_element(By.TAG_NAME, 'domain-view')
+    time.sleep(2)
+    shadow_host3 =driver.execute_script('return arguments[0].shadowRoot', domain_view).find_element(By.CLASS_NAME, 'container').find_element(By.CLASS_NAME, 'row').find_element(By.CLASS_NAME, 'col-auto').find_element(By.TAG_NAME, 'vt-ioc-score-widget')
+    shadow_host4=driver.execute_script('return arguments[0].shadowRoot', shadow_host3).find_element(By.CLASS_NAME, 'rounded').find_element(By.TAG_NAME, 'vt-ioc-score-widget-detections-chart')
+    target_element=driver.execute_script('return arguments[0].shadowRoot', shadow_host4).find_element(By.CLASS_NAME, 'rounded-circle').find_element(By.CLASS_NAME, 'w-100').find_element(By.ID, 'positives')
+    return target_element.text
 
-find_search_button(driver)
+def reading_csv():
+    with open('/home/beast/Desktop/automation/vt/input_file.csv') as input_file:
+        inputs=input_file.read()
+    if len(inputs.splitlines())>0:
+        for source in inputs.splitlines():
+            if re.match(ipv4_regex, source):
+                malicious_score_for_ip=gathering_details_ip(source)
+                with open('/home/beast/Desktop/automation/vt/output_file.csv', 'a', newline='') as output_file:
+                    if int(malicious_score_for_ip)>0:
+                        output_file.write(f'{source}, {malicious_score_for_ip}, Malicious\n')
+                    else:
+                        output_file.write(f'{source}, {malicious_score_for_ip}, Not Malicious\n')
+                    print(f'{source} completed 😄')
+                continue
+            if '.' in source:
+                split_source=source.split('.')
+                if split_source[len(split_source)-1] in tlds:
+                    malicious_score_for_domain=gathering_details_domain(source)
+                    with open('/home/beast/Desktop/automation/vt/output_file.csv', 'a') as output_file:
+                        if int(malicious_score_for_ip)>0:
+                            output_file.write(f'{source}, {malicious_score_for_ip}, Malicious\n')
+                        else:
+                            output_file.write(f'{source}, {malicious_score_for_ip}, Not Malicious\n')
+                        print(f'{source} completed 😄')
+                else:
+                    print(f'{source} not a valid Domain/IP 😢')
+            else:
+                print(f'{source} not a valid Domain/IP 😢')
+    else:
+        print(f'There is no Data in the input file 😟')
+
+if os.path.exists('/home/beast/Desktop/automation/vt/output_file.csv'):
+    os.remove('/home/beast/Desktop/automation/vt/output_file.csv')
+
+reading_csv()
