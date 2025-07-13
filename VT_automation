@@ -3,6 +3,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+import pandas as pd
 import time
 import re
 import os
@@ -22,6 +23,18 @@ tlds = [
     'club', 'shop', 'blog', 'news', 'guru', 'today', 'life', 'solutions', 'world', 'agency'
 ]
 ipv4_regex = r'\b(?:(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\.){3}(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)\b'
+
+with open('/home/beast/Desktop/automation/vt/main_file.csv') as main_file:
+    main_file=main_file.read()
+main_file=main_file.splitlines()
+
+with open('/home/beast/Desktop/automation/vt/input_file.csv') as input_file:
+        inputs=input_file.read()
+inputs=inputs.splitlines()
+
+for duplicate in main_file:
+    if duplicate in inputs:
+        inputs.remove(f'{duplicate}')
 
 def gathering_details_ip(ip):
     vt_ui_shell = driver.find_element(By.TAG_NAME, 'vt-ui-shell')
@@ -58,10 +71,8 @@ def gathering_details_domain(domain):
     return target_element.text
 
 def reading_csv():
-    with open('/home/beast/Desktop/automation/vt/input_file.csv') as input_file:
-        inputs=input_file.read()
-    if len(inputs.splitlines())>0:
-        for source in inputs.splitlines():
+    if len(inputs)>0:
+        for source in inputs:
             if re.match(ipv4_regex, source):
                 malicious_score_for_ip=gathering_details_ip(source)
                 with open('/home/beast/Desktop/automation/vt/output_file.csv', 'a', newline='') as output_file:
@@ -86,7 +97,7 @@ def reading_csv():
             else:
                 print(f'{source} not a valid Domain/IP 😢')
     else:
-        print(f'There is no Data in the input file 😟')
+        print(f'There is no Data in the input file 😕')
 
 if os.path.exists('/home/beast/Desktop/automation/vt/output_file.csv'):
     os.remove('/home/beast/Desktop/automation/vt/output_file.csv')
